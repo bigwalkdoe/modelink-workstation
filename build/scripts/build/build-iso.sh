@@ -369,6 +369,10 @@ printf "%s" "$(du -sx --block-size=1 "$CHROOT_DIR" | cut -f1)" > "${IMAGE_DIR}/c
 mkdir -p "${IMAGE_DIR}/.disk"
 echo "Modelink Workstation ${UBUNTU_VERSION} LTS - ${EDITION^} - ${ARCH}" > "${IMAGE_DIR}/.disk/info"
 
+# Remove chroot to free disk space before ISO assembly
+log "Removing chroot to free disk space..."
+rm -rf "$CHROOT_DIR"
+
 # ============================================================
 # STAGE 9 — Set up ISO boot configuration
 # ============================================================
