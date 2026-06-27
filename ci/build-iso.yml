@@ -49,11 +49,10 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y \
             debootstrap \
+            squashfs-tools \
             xorriso \
             isolinux \
-            syslinux-utils \
-            squashfs-tools \
-            genisoimage \
+            syslinux-common \
             grub-pc-bin \
             grub-efi-amd64-bin \
             grub-efi-ia32-bin \
@@ -119,7 +118,7 @@ jobs:
 
       - name: Validate package lists
         run: |
-          for f in build/packages/*.txt build/packages/editions/*/*.txt; do
+          for f in build/packages/*.txt; do
             [ -f "$f" ] || continue
             echo "Checking $f..."
             while IFS= read -r line; do

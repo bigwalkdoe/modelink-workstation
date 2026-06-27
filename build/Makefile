@@ -1,75 +1,82 @@
-.PHONY: all core developer ai security enterprise clean
+.PHONY: all core developer ai security enterprise clean validate docker-build help
 
 EDITION ?= developer
 OUTPUT_DIR ?= /tmp/modelink-iso
+BUILD_SCRIPT := ./build/scripts/build/build-iso.sh
 
 all: $(EDITION)
 
-# Build a specific edition
-core:
-	@echo "Building Modelink Core edition..."
-	@./build/scripts/build/build-iso.sh --edition core
+# ---- Build individual editions ----
+core developer ai security enterprise:
+	@echo "Building Modelink $(@) edition..."
+	@sudo "$(BUILD_SCRIPT)" --edition "$@" --output "$(OUTPUT_DIR)"
 
-developer:
-	@echo "Building Modelink Developer edition..."
-	@./build/scripts/build/build-iso.sh --edition developer
-
-ai:
-	@echo "Building Modelink AI edition..."
-	@./build/scripts/build/build-iso.sh --edition ai
-
-security:
-	@echo "Building Modelink Security edition..."
-	@./build/scripts/build/build-iso.sh --edition security
-
-enterprise:
-	@echo "Building Modelink Enterprise edition..."
-	@./build/scripts/build/build-iso.sh --edition enterprise
-
-# Build using Docker
+# ---- Build in Docker ----
 docker-build:
+	@echo "Building Modelink $(EDITION) edition inside Docker..."
 	docker build -t modelink-builder -f build/Dockerfile .
-	docker run --rm -v $(OUTPUT_DIR):/output \
-		-v /var/run/docker.sock:/var/run/docker.sock \
-		modelink-builder --edition $(EDITION)
+	mkdir -p "$(OUTPUT_DIR)"
+	docker run --rm \
+		--privileged \
+		-v "$(OUTPUT_DIR):/output" \
+		modelink-builder \
+		--edition "$(EDITION)" --output /output
 
-# Set up edition-specific output directories
-editions/%:
-	@mkdir -p $(OUTPUT_DIR)/$*/
+docker-build-all:
+	@echo "Building all editions inside Docker (this will take a while)..."
+	docker build -t modelink-builder -f build/Dockerfile .
+	mkdir -p "$(OUTPUT_DIR)"
+	for edition in core developer ai security enterprise; do \
+		echo "=== Building $$edition ==="; \
+		docker run --rm \
+			--privileged \
+			-v "$(OUTPUT_DIR):/output" \
+			modelink-builder \
+			--edition "$$edition" --output /output; \
+	done
 
-# Clean build artifacts
+# ---- Build all editions (native) ----
+build-all: core developer ai security enterprise
+	@echo "All editions built in $(OUTPUT_DIR)"
+
+# ---- Clean ----
 clean:
 	@echo "Cleaning build artifacts..."
-	@rm -rf $(OUTPUT_DIR)
+	@sudo rm -rf "$(OUTPUT_DIR)"
 
-# Validate package lists
+# ---- Validate package lists ----
 validate:
 	@echo "Validating package lists..."
 	@for f in build/packages/*.txt; do \
-		echo "  Checking $$f..."; \
-		while IFS= read -r pkg; do \
-			[ -z "$$pkg" ] || [ "$${pkg:0:1}" = "#" ] && continue; \
-			echo "    $$pkg"; \
-		done < "$$f"; \
+		ed=$$(basename "$$f" .txt); \
+		count=$$(grep -v '^\s*#' "$$f" | grep -v '^\s*$$' | wc -l); \
+		echo "  $$ed: $$count packages"; \
 	done
 
-# Build all editions
-build-all: core developer ai security enterprise
+# ---- Syntax check build scripts ----
+check:
+	@echo "Checking build scripts..."
+	@bash -n build/scripts/build/build-iso.sh && echo "  build-iso.sh: OK"
+	@bash -n build/scripts/chroot/01-system-config.sh && echo "  01-system-config.sh: OK"
+	@bash -n build/scripts/chroot/02-kde-config.sh && echo "  02-kde-config.sh: OK"
+	@bash -n build/scripts/post-install/first-boot.sh && echo "  first-boot.sh: OK"
 
+# ---- Help ----
 help:
 	@echo "Modelink Workstation ISO Builder"
 	@echo ""
 	@echo "Usage:"
-	@echo "  make <edition>     Build a specific edition (core|developer|ai|security|enterprise)"
-	@echo "  make EDITION=ai    Build with default edition set to AI"
-	@echo "  make docker-build  Build inside Docker container"
-	@echo "  make clean         Remove build artifacts"
-	@echo "  make build-all     Build all editions"
-	@echo "  make validate      Validate package lists"
+	@echo "  make <edition>      Build a specific edition"
+	@echo "                      (core | developer | ai | security | enterprise)"
+	@echo "  make docker-build   Build inside Docker container (recommended)"
+	@echo "  make validate       Count packages per edition"
+	@echo "  make check          Syntax-check all build scripts"
+	@echo "  make clean          Remove all build artifacts"
 	@echo ""
-	@echo "Editions:"
-	@echo "  core       - Lightweight engineering base"
-	@echo "  developer  - Full-stack development environment"
-	@echo "  ai         - Optimized for local LLM and AI agents"
-	@echo "  security   - Focused on defensive security"
-	@echo "  enterprise - Organizational deployment readiness"
+	@echo "Variables:"
+	@echo "  EDITION=developer   Default edition to build"
+	@echo "  OUTPUT_DIR=/tmp/modelink-iso"
+	@echo ""
+	@echo "Examples:"
+	@echo "  make ai EDITION=ai"
+	@echo "  make docker-build EDITION=enterprise OUTPUT_DIR=./isos"
