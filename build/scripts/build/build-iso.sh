@@ -118,7 +118,10 @@ trap cleanup_mounts EXIT
 
 cp /etc/resolv.conf "$CHROOT_DIR/etc/resolv.conf"
 
-chroot "$CHROOT_DIR" /bin/bash 2>&1 | tee -a "$LOGFILE" <<'CHROOT'
+mkdir -p "$CHROOT_DIR/tmp"
+
+cat > "$CHROOT_DIR/tmp/stage2-setup.sh" << 'STAGE2'
+#!/bin/bash
 set -euo pipefail
 export DEBIAN_FRONTEND=noninteractive
 export TZ=UTC
@@ -173,7 +176,10 @@ apt-get install -y --no-install-recommends \
 # Clean up apt
 apt-get clean
 rm -rf /var/lib/apt/lists/*
-CHROOT
+STAGE2
+
+chmod +x "$CHROOT_DIR/tmp/stage2-setup.sh"
+chroot "$CHROOT_DIR" /bin/bash /tmp/stage2-setup.sh 2>&1 | tee -a "$LOGFILE"
 
 # ============================================================
 # STAGE 3 — Install edition packages
@@ -195,7 +201,8 @@ fi
 PACKAGES=$(cat "${PKG_FILES[@]}" | grep -v '^\s*#' | grep -v '^\s*$' | sort -u | tr '\n' ' ')
 
 if [ -n "$PACKAGES" ]; then
-  chroot "$CHROOT_DIR" /bin/bash 2>&1 | tee -a "$LOGFILE" <<CHROOT
+  cat > "$CHROOT_DIR/tmp/stage3-packages.sh" << STAGE3
+#!/bin/bash
 set -uo pipefail
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
@@ -213,7 +220,10 @@ apt-get install -y $PACKAGES || {
     echo "[!] Failed to install:\$FAILED" >&2
   fi
 }
-CHROOT
+STAGE3
+
+  chmod +x "$CHROOT_DIR/tmp/stage3-packages.sh"
+  chroot "$CHROOT_DIR" /bin/bash /tmp/stage3-packages.sh 2>&1 | tee -a "$LOGFILE"
 fi
 
 # ============================================================
@@ -271,7 +281,8 @@ fi
 # ============================================================
 log "Applying system configuration..."
 
-chroot "$CHROOT_DIR" /bin/bash 2>&1 | tee -a "$LOGFILE" <<'CHROOT'
+cat > "$CHROOT_DIR/tmp/stage6-config.sh" << 'STAGE6'
+#!/bin/bash
 set -euo pipefail
 
 # Hostname
@@ -297,20 +308,23 @@ ufw --force enable           2>/dev/null || true
 rm -f /etc/machine-id
 rm -f /var/lib/dbus/machine-id
 touch /etc/machine-id
-CHROOT
+STAGE6
+
+chmod +x "$CHROOT_DIR/tmp/stage6-config.sh"
+chroot "$CHROOT_DIR" /bin/bash /tmp/stage6-config.sh 2>&1 | tee -a "$LOGFILE"
 
 # ============================================================
 # STAGE 7 — Clean up chroot for ISO
 # ============================================================
 log "Preparing chroot for ISO packaging..."
 
-chroot "$CHROOT_DIR" /bin/bash 2>&1 | tee -a "$LOGFILE" <<'CHROOT'
+cat > "$CHROOT_DIR/tmp/stage7-cleanup.sh" << 'STAGE7'
+#!/bin/bash
 set -euo pipefail
 
 # Clean package cache
 apt-get clean
 rm -rf /var/lib/apt/lists/*
-rm -rf /tmp/*
 rm -f /etc/resolv.conf
 rm -f /var/crash/*
 rm -f /var/log/*.log
@@ -320,7 +334,13 @@ rm -rf /root/.bash_history /root/.cache
 for f in /var/log/*.log /var/log/*.gz; do
   [ -f "$f" ] && truncate -s 0 "$f" 2>/dev/null || true
 done
-CHROOT
+
+# Clean up all temp files
+rm -rf /tmp/*
+STAGE7
+
+chmod +x "$CHROOT_DIR/tmp/stage7-cleanup.sh"
+chroot "$CHROOT_DIR" /bin/bash /tmp/stage7-cleanup.sh 2>&1 | tee -a "$LOGFILE"
 
 # Unmount before squashing
 cleanup_mounts
