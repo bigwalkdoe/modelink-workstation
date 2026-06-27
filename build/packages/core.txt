@@ -98,7 +98,7 @@ upower
 tlp
 
 # File Systems
-exfat-utils
+exfatprogs
 ntfs-3g
 btrfs-progs
 xfsprogs

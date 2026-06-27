@@ -17,18 +17,63 @@ USER_NAME="${SUDO_USER:-engineer}"
 USER_HOME="/home/${USER_NAME}"
 
 # ---- 1. System Update ----
-echo "[1/8] Updating system packages..."
+echo "[1/9] Updating system packages..."
 apt-get update
 apt-get upgrade -y
 apt-get autoremove -y
 
-# ---- 2. Git Configuration ----
-echo "[2/8] Configuring Git (defaults)..."
+# ---- 2. External Development Tools ----
+echo "[2/9] Installing external development tools..."
+mkdir -p /usr/local/share/modelink
+
+# GitHub CLI
+if ! command -v gh &>/dev/null; then
+  mkdir -p /tmp/gh && cd /tmp/gh
+  wget -q https://github.com/cli/cli/releases/latest/download/gh_*_linux_amd64.deb -O gh.deb 2>/dev/null && \
+    dpkg -i gh.deb 2>/dev/null || true
+  rm -rf /tmp/gh
+fi
+
+# VS Code
+if ! command -v code &>/dev/null; then
+  mkdir -p /tmp/code && cd /tmp/code
+  wget -q -O code.deb https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64 2>/dev/null && \
+    dpkg -i code.deb 2>/dev/null || true
+  rm -rf /tmp/code
+fi
+
+# kubectl (latest stable)
+if ! command -v kubectl &>/dev/null; then
+  curl -fsSL https://dl.k8s.io/release/stable.txt 2>/dev/null | \
+    xargs -I{} curl -fsSL "https://dl.k8s.io/release/{}/bin/linux/amd64/kubectl" -o /usr/local/bin/kubectl 2>/dev/null && \
+    chmod +x /usr/local/bin/kubectl || true
+fi
+
+# Helm
+if ! command -v helm &>/dev/null; then
+  curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 2>/dev/null | bash 2>/dev/null || true
+fi
+
+# Ollama
+if ! command -v ollama &>/dev/null; then
+  curl -fsSL https://ollama.ai/install.sh 2>/dev/null | sh 2>/dev/null || true
+fi
+
+# pnpm
+if ! command -v pnpm &>/dev/null; then
+  npm install -g pnpm 2>/dev/null || true
+fi
+
+# TypeScript
+npm install -g typescript 2>/dev/null || true
+
+# ---- 3. Git Configuration ----
+echo "[3/9] Configuring Git (defaults)..."
 cat > "$USER_HOME/.gitconfig" << 'EOF'
 [init]
     defaultBranch = main
 [core]
-    editor = code --wait
+    editor = nano --wait
     autocrlf = input
 [push]
     autoSetupRemote = true
@@ -40,7 +85,7 @@ EOF
 chown "${USER_NAME}:${USER_NAME}" "$USER_HOME/.gitconfig"
 
 # ---- 3. SSH Key Generation (if not exists) ----
-echo "[3/8] Setting up SSH..."
+echo "[4/9] Setting up SSH..."
 mkdir -p "$USER_HOME/.ssh"
 chmod 700 "$USER_HOME/.ssh"
 
@@ -53,7 +98,7 @@ fi
 chown -R "${USER_NAME}:${USER_NAME}" "$USER_HOME/.ssh"
 
 # ---- 4. Workspace Creation ----
-echo "[4/8] Creating workspace structure..."
+echo "[5/9] Creating workspace structure..."
 mkdir -p \
   "${WORKSPACE_BASE}/Projects" \
   "${WORKSPACE_BASE}/Clients" \
@@ -79,7 +124,7 @@ mkdir -p \
 chown -R "${USER_NAME}:${USER_NAME}" "$WORKSPACE_BASE"
 
 # ---- 5. Shell Enhancement ----
-echo "[5/8] Configuring shell..."
+echo "[6/9] Configuring shell..."
 cat >> "$USER_HOME/.bashrc" << 'BASHRC'
 
 # ---- Modelink Workstation Shell Configuration ----
@@ -146,7 +191,7 @@ BASHRC
 chown "${USER_NAME}:${USER_NAME}" "$USER_HOME/.bashrc"
 
 # ---- 6. Install Starship Prompt ----
-echo "[6/8] Installing Starship prompt..."
+echo "[7/9] Installing Starship prompt..."
 if ! command -v starship &>/dev/null; then
   curl -sS https://starship.rs/install.sh | sh -s -- -y 2>/dev/null || true
 fi
@@ -235,7 +280,7 @@ STARSHIP
 chown -R "${USER_NAME}:${USER_NAME}" "$USER_HOME/.config"
 
 # ---- 7. Modelink CLI ----
-echo "[7/8] Installing Modelink CLI..."
+echo "[8/9] Installing Modelink CLI..."
 cat > /usr/local/bin/modelink << 'MODELINK_CLI'
 #!/bin/bash
 # Modelink Workstation CLI — Development Environment Manager
@@ -306,7 +351,7 @@ MODELINK_CLI
 chmod +x /usr/local/bin/modelink
 
 # ---- 8. Welcome Message ----
-echo "[8/8] Setting up welcome message..."
+echo "[9/9] Setting up welcome message..."
 cat > /etc/update-motd.d/99-modelink << 'MOTD'
 #!/bin/bash
 echo ""

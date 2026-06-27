@@ -1,56 +1,36 @@
 # ============================================================
 # Modelink Workstation — AI Platform Packages
 # ============================================================
+# Note: Ollama, CUDA/ROCm drivers, LangChain, PyTorch, etc.
+# are installed by first-boot.sh from their official sources.
 
 # NVIDIA GPU Support
-nvidia-driver-535
+nvidia-driver-550
 nvidia-cuda-toolkit
 nvidia-cuda-toolkit-gcc
-nvidia-container-toolkit
-libcudnn8
-libcudnn8-dev
 nvidia-prime
 nvidia-settings
 
-# AMD GPU Support (ROCm)
-rocm-dev
-rocm-libs
-rocm-dkms
-rocm-hip-libraries
-
-# Python AI Stack
+# Python AI Stack (standard repos)
 python3-numpy
 python3-scipy
 python3-pandas
 python3-matplotlib
 python3-scikit-learn
-python3-torch
-python3-tensorflow
-python3-transformers
-python3-datasets
-python3-accelerate
-python3-pytorch-lightning
-python3-onnx
-python3-onnxruntime
 python3-opencv
 python3-pillow
-python3-tiktoken
 python3-sentencepiece
-python3-llama-cpp
-python3-huggingface-hub
-python3-ollama
+python3-sqlalchemy
+python3-onnx
 
-# Model Runtimes
-ollama
+# Jupyter
+jupyter-notebook
+python3-jupyter-core
+python3-nbformat
+python3-nbconvert
+python3-ipywidgets
 
-# Vector Databases
-qdrant
-chromadb
-milvus
-
-# MCP (Model Context Protocol) Support
-# Note: MCP servers are typically installed via npm/pip post-install
-# These packages provide the runtime dependencies
+# MCP Runtime Dependencies
 nodejs
 python3-fastapi
 python3-uvicorn
@@ -59,23 +39,6 @@ python3-httpx
 python3-aiohttp
 python3-websockets
 
-# Agent Frameworks
-python3-langchain
-python3-langgraph
-python3-langserve
-python3-crewai
-python3-autogen
-python3-semantic-kernel
-
-# Additional AI/ML Tools
-jupyter-notebook
-jupyter-lab
-python3-jupyter-core
-python3-nbformat
-python3-nbconvert
-python3-ipywidgets
-
-# Monitoring for AI
+# AI Utilities
 nvtop
-nvidia-smi
-rocm-smi-lib
+pciutils

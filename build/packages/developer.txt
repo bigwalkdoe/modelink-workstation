@@ -1,6 +1,8 @@
 # ============================================================
 # Modelink Workstation — Developer Engineering Platform
 # ============================================================
+# Note: Tools like kubectl, helm, kind, minikube, code, ollama
+# require third-party repos. They are installed by first-boot.sh.
 
 # Languages
 python3
@@ -19,19 +21,16 @@ cmake
 ninja-build
 meson
 pkg-config
-typescript
 nodejs
 npm
 
 # Editors
-code
 neovim
 vim
 
 # Version Control
 git
 git-lfs
-github-cli
 gitg
 gitk
 meld
@@ -42,7 +41,6 @@ postgresql-client
 redis
 sqlite3
 sqlitebrowser
-pgadmin4
 
 # Container
 docker.io
@@ -54,16 +52,6 @@ containernetworking-plugins
 podman-compose
 crun
 slirp4netns
-
-# Kubernetes
-kubectl
-helm
-kind
-minikube
-
-# API Development
-bruno
-postman
 
 # Build Tools
 autoconf
@@ -109,11 +97,9 @@ fzf
 bat
 eza
 zoxide
-atuin
 lsd
 jq
 yq
-htop
 neofetch
 figlet
 lolcat
@@ -132,11 +118,9 @@ asciidoctor
 nodejs
 npm
 yarn
-pnpm
 
 # Misc Developer Tools
 entr
-watchman
 shellcheck
 shfmt
 pre-commit
