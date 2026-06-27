@@ -479,20 +479,19 @@ mount -o loop "$EFI_IMAGE" "$EFI_MOUNT"
 mkdir -p "$EFI_MOUNT/EFI/BOOT"
 mkdir -p "$EFI_MOUNT/boot/grub"
 
-# Install GRUB EFI binary
+# Install GRUB EFI binary into the FAT image (for EFI boot)
 if [ -f /usr/lib/shim/shimx64.efi.signed ]; then
   cp /usr/lib/shim/shimx64.efi.signed "$EFI_MOUNT/EFI/BOOT/BOOTx64.EFI"
   cp /usr/lib/grub/x86_64-efi-signed/grubx64.efi.signed "$EFI_MOUNT/EFI/BOOT/grubx64.efi" 2>/dev/null || true
 else
-  cp /usr/lib/grub/x86_64-efi/grub.efi "$EFI_MOUNT/EFI/BOOT/BOOTx64.EFI" 2>/dev/null || true
-  if [ -f /usr/lib/grub/x86_64-efi/grub.efi ]; then
-    grub-mkstandalone -O x86_64-efi -o "$EFI_MOUNT/EFI/BOOT/BOOTx64.EFI" \
-      "boot/grub/grub.cfg=$GRUB_DIR/grub.cfg" >> "$LOGFILE" 2>&1 || true
-  fi
+  grub-mkstandalone -O x86_64-efi -o "$EFI_MOUNT/EFI/BOOT/BOOTx64.EFI" \
+    "boot/grub/grub.cfg=$GRUB_DIR/grub.cfg" >> "$LOGFILE" 2>&1
 fi
 
-# Copy GRUB modules
-mkdir -p "$EFI_MOUNT/EFI/BOOT"
+# Copy bootloader from FAT image to ISO 9660 /EFI/BOOT (required by UEFI)
+mkdir -p "${IMAGE_DIR}/EFI/BOOT"
+cp -r "$EFI_MOUNT/EFI/BOOT"/* "${IMAGE_DIR}/EFI/BOOT/"
+
 umount "$EFI_MOUNT"
 rm -rf "$EFI_MOUNT"
 

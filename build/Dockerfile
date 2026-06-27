@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y \
     isolinux \
     syslinux-common \
     syslinux-efi \
+    syslinux-utils \
     grub-pc-bin \
     grub-efi-amd64-bin \
     grub-efi-ia32-bin \
