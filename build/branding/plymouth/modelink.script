@@ -1,0 +1,37 @@
+/* Modelink Workstation Plymouth Boot Splash */
+
+Logo = Image("/usr/share/plymouth/themes/modelink/logo.png");
+
+if (Logo) {
+  Window.SetBackgroundTopColor(0.08, 0.08, 0.10);
+  Window.SetBackgroundBottomColor(0.04, 0.04, 0.06);
+
+  LogoX = Window.GetWidth() / 2 - Logo.GetWidth() / 2;
+  LogoY = Window.GetHeight() / 2 - Logo.GetHeight() / 2 - 40;
+
+  Logo.SetX(LogoX);
+  Logo.SetY(LogoY);
+  Logo.SetZ(10);
+  Logo.SetOpacity(0.9);
+  Logo.Visible();
+}
+
+/* Progress bar */
+Bar = Sprite();
+Bar.SetWidth(240);
+Bar.SetHeight(4);
+BarX = Window.GetWidth() / 2 - 120;
+BarY = Window.GetHeight() / 2 + 40;
+
+fun boot_progress_callback(duration, progress) {
+  if (progress > 0) {
+    Bar.SetX(BarX);
+    Bar.SetY(BarY);
+    Bar.SetPosition(BarX, BarY, 5);
+    Bar.SetWidth(240 * progress);
+    Bar.SetHeight(4);
+    Bar.SetColor(0.49, 0.30, 1.0);
+    Bar.SetOpacity(0.85);
+    Bar.Visible();
+  }
+}

@@ -1,0 +1,12 @@
+# Modelink Workstation GRUB Theme
+title-text: "Modelink Workstation"
+title-font: "JetBrains Mono Regular 16"
+title-color: "#7C4DFF"
+desktop-image: "background.png"
+desktop-color: "#1A1A1A"
+terminal-font: "JetBrains Mono Regular 12"
+terminal-box: "terminal-box.png"
+terminal-left: "0"
+terminal-top: "0"
+terminal-width: "100%"
+terminal-height: "100%"

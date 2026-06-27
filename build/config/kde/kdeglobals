@@ -1,0 +1,17 @@
+[General]
+ColorScheme=ModelinkDark
+Name=ModelinkDark
+widgetStyle=Breeze
+font=Inter,10,-1,5,50,0,0,0,0,0
+fixed=JetBrains Mono,10,-1,5,50,0,0,0,0,0
+smallestReadableFont=Inter,8,-1,5,50,0,0,0,0,0
+
+[KDE]
+AnimationDurationFactor=0.25
+widgetStyle=Breeze
+
+[Icons]
+Theme=breeze-dark
+
+[UiSettings]
+ColorScheme=ModelinkDark

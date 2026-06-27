@@ -1,0 +1,143 @@
+# ============================================================
+# Modelink Workstation — Developer Engineering Platform
+# ============================================================
+
+# Languages
+python3
+python3-pip
+python3-venv
+python3-dev
+python3-poetry
+rustup
+golang-go
+default-jdk
+gcc
+g++
+gdb
+make
+cmake
+ninja-build
+meson
+pkg-config
+typescript
+nodejs
+npm
+
+# Editors
+code
+neovim
+vim
+
+# Version Control
+git
+git-lfs
+github-cli
+gitg
+gitk
+meld
+
+# Databases
+postgresql
+postgresql-client
+redis
+sqlite3
+sqlitebrowser
+pgadmin4
+
+# Container
+docker.io
+docker-compose-v2
+podman
+buildah
+skopeo
+containernetworking-plugins
+podman-compose
+crun
+slirp4netns
+
+# Kubernetes
+kubectl
+helm
+kind
+minikube
+
+# API Development
+bruno
+postman
+
+# Build Tools
+autoconf
+automake
+libtool
+bison
+flex
+gettext
+ccache
+distcc
+scons
+
+# Debugging & Profiling
+strace
+ltrace
+valgrind
+perf-tools-unstable
+systemtap
+htop
+btop
+iotop
+glances
+dstat
+
+# Network Debugging
+nmap
+tcpdump
+wireshark
+tshark
+netcat-openbsd
+socat
+dnsutils
+traceroute
+mtr
+iperf3
+
+# Shell & Terminal
+tmux
+screen
+ripgrep
+fd-find
+fzf
+bat
+eza
+zoxide
+atuin
+lsd
+jq
+yq
+htop
+neofetch
+figlet
+lolcat
+httpie
+
+# Documentation
+pandoc
+texlive-latex-base
+texlive-latex-extra
+texlive-fonts-recommended
+texlive-xetex
+wkhtmltopdf
+asciidoctor
+
+# Frontend
+nodejs
+npm
+yarn
+pnpm
+
+# Misc Developer Tools
+entr
+watchman
+shellcheck
+shfmt
+pre-commit
+clang-format

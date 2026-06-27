@@ -1,0 +1,138 @@
+# ============================================================
+# Modelink Workstation — Security Platform Packages
+# ============================================================
+
+# Firewall & Hardening
+ufw
+gufw
+firewalld
+iptables
+nftables
+fail2ban
+rkhunter
+chkrootkit
+lynis
+aide
+tiger
+crowdsec
+
+# Network Analysis
+nmap
+zenmap
+tcpdump
+wireshark
+tshark
+ettercap-graphical
+bettercap
+netcat-openbsd
+socat
+hping3
+masscan
+dnsutils
+dnsmasq
+dnsspoof
+sslstrip
+responder
+mitmproxy
+
+# Vulnerability Assessment
+nikto
+sqlmap
+dirb
+gobuster
+wfuzz
+hydra
+john
+hashcat
+aircrack-ng
+reaver
+bully
+searchsploit
+metasploit-framework
+
+# Web Security
+burpsuite
+zap-proxy
+wpscan
+nuclei
+httpx
+subfinder
+ffuf
+
+# Forensics
+autopsy
+sleuthkit
+foremost
+scalpel
+binwalk
+volatility3
+guymager
+testdisk
+photorec
+
+# Cryptography
+gnupg
+gnupg2
+gpa
+seahorse
+openssl
+libssl-dev
+libgcrypt20-dev
+cryptsetup
+luksmeta
+veracrypt
+age
+
+# Packet Analysis
+scapy
+dpkt
+pyshark
+
+# Wireless
+kismet
+wifite
+horst
+iw
+iwconfig
+airgeddon
+
+# System Monitoring
+auditd
+audispd-plugins
+sysstat
+aide
+ossec-hids
+wazuh-agent
+
+# Secure Communication
+wireguard
+wireguard-tools
+openvpn
+strongswan
+libreswan
+tor
+torbrowser-launcher
+proxychains4
+
+# Password Management
+keepassxc
+pass
+pass-otp
+bw-cli
+
+# GPG and Smart Cards
+opensc
+pcscd
+libpcsclite1
+yubikey-personalization
+yubikey-manager
+yubikey-luks
+
+# Security Utilities
+macchanger
+secure-delete
+wipe
+shred
+steghide
+outguess
+stegsolve

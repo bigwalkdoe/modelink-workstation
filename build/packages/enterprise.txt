@@ -1,0 +1,123 @@
+# ============================================================
+# Modelink Workstation — Enterprise Platform Extras
+# ============================================================
+
+# Configuration Management
+ansible
+ansible-lint
+puppet
+salt-master
+salt-minion
+chef
+chef-workstation
+
+# Infrastructure as Code
+opentofu
+terraform
+terraform-docs
+hcledit
+terragrunt
+
+# Monitoring & Observability
+prometheus
+prometheus-node-exporter
+prometheus-alertmanager
+grafana
+loki
+promtail
+telegraf
+influxdb
+netdata
+icinga2
+nagios4
+zabbix-agent
+zabbix-frontend-php
+
+# Log Management
+elasticsearch
+logstash
+kibana
+graylog
+rsyslog
+syslog-ng
+lnav
+
+# Identity & Access Management
+freeipa-client
+sssd
+ldap-utils
+libnss-ldap
+libpam-ldap
+keycloak
+authelia
+
+# Backup & Recovery
+bacula
+bacula-client
+duplicity
+restic
+borgbackup
+borgmatic
+rdiff-backup
+deja-dup
+timeshift
+snapper
+etckeeper
+
+# Directory Services
+openldap
+slapd
+ldap-utils
+phpldapadmin
+
+# Certificate Management
+certbot
+python3-certbot-dns-cloudflare
+python3-certbot-dns-route53
+python3-certbot-dns-digitalocean
+step-cli
+
+# File Sharing
+nfs-kernel-server
+nfs-common
+samba
+samba-client
+cifs-utils
+
+# Performance Testing
+sysbench
+fio
+iperf3
+stress-ng
+bonnie++
+phoronix-test-suite
+
+# Enterprise Automation
+foreman
+katello
+theforeman
+
+# Virtualization
+qemu-kvm
+libvirt-daemon-system
+libvirt-clients
+virt-manager
+vagrant
+vagrant-libvirt
+packer
+
+# CI/CD Tooling
+gitlab-runner
+jenkins
+drone-ci
+woodpecker
+
+# Container Orchestration (advanced)
+k3s
+microk8s
+k9s
+kustomize
+istioctl
+linkerd
+fluxcd
+argocd

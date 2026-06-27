@@ -1,0 +1,78 @@
+#cloud-config
+autoinstall:
+  version: 1
+  identity:
+    hostname: modelink
+    username: engineer
+    password: "$6$rounds=4096$change_on_first_login"
+
+  locale: en_US.UTF-8
+  timezone: UTC
+  keyboard:
+    layout: us
+
+  ssh:
+    install-server: true
+    allow-pw: true
+    authorized-keys: []
+
+  storage:
+    layout:
+      name: lvm
+      sizing: all
+
+  packages:
+    - ubuntu-standard
+    - ubuntu-minimal
+
+  snaps:
+    - name: lxd
+      classic: true
+
+  late-commands:
+    # Clean up autoinstall user password — force change on first login
+    - |
+      curtin in-target --passwd -- chage -d 0 engineer
+
+    # Ensure system is fully updated after install
+    - curtin in-target -- apt-get update
+    - curtin in-target -- apt-get upgrade -y
+
+    # Set default target to graphical
+    - curtin in-target -- systemctl set-default graphical.target
+
+    # Install Modelink post-install hook
+    - |
+      curtin in-target -- mkdir -p /opt/modelink
+    - |
+      echo '#!/bin/bash
+        # Modelink Workstation — First Boot Initialization
+        if [ ! -f /var/lib/modelink-initialized ]; then
+          /opt/modelink/first-boot.sh
+          touch /var/lib/modelink-initialized
+        fi' > /target/usr/local/bin/modelink-init
+    - curtin in-target -- chmod +x /usr/local/bin/modelink-init
+
+    # Create first-boot systemd service
+    - |
+      echo '[Unit]
+      Description=Modelink Workstation First Boot Initialization
+      ConditionPathExists=!/var/lib/modelink-initialized
+
+      [Service]
+      Type=oneshot
+      ExecStart=/opt/modelink/first-boot.sh
+      RemainAfterExit=yes
+
+      [Install]
+      WantedBy=multi-user.target' > /target/etc/systemd/system/modelink-first-boot.service
+    - curtin in-target -- systemctl enable modelink-first-boot.service
+
+  user-data:
+    disable_root: false
+    timezone: UTC
+    packages:
+      - qemu-guest-agent
+    runcmd:
+      - [systemctl, enable, qemu-guest-agent]
+      - [systemctl, start, qemu-guest-agent]

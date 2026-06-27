@@ -1,0 +1,116 @@
+# ============================================================
+# Modelink Workstation — Core System Packages
+# ============================================================
+
+# Desktop Environment
+kde-plasma-desktop
+plasma-workspace
+sddm
+kde-config-sddm
+kde-config-gtk-style
+kde-config-gtk-style-preview
+kde-connect
+plasma-discover
+plasma-discover-backend-snap
+plasma-discover-backend-flatpak
+kcalc
+kate
+dolphin
+konsole
+gwenview
+spectacle
+okular
+
+# Display and Graphics
+xserver-xorg-core
+xserver-xorg-video-intel
+xserver-xorg-video-nouveau
+xserver-xorg-video-vesa
+xorg
+mesa-utils
+vulkan-tools
+libvulkan1
+libvulkan1:i386
+
+# Fonts
+fonts-jetbrains-mono
+fonts-inter
+fonts-noto
+fonts-noto-cjk
+fonts-noto-color-emoji
+fonts-firacode
+fonts-font-awesome
+
+# Networking
+network-manager
+network-manager-openvpn
+network-manager-vpnc
+network-manager-pptp
+wireless-tools
+wpasupplicant
+avahi-daemon
+openssh-client
+openssh-server
+curl
+wget
+
+# System Utilities
+ufw
+fail2ban
+apparmor
+apparmor-profiles
+apparmor-utils
+policykit-1
+policykit-1-gnome
+pkexec
+sudo
+cron
+logrotate
+systemd-timesyncd
+systemd-resolved
+
+# Firmware
+linux-firmware
+intel-microcode
+amd64-microcode
+
+# Printing (optional base support)
+cups
+cups-bsd
+cups-client
+
+# Bluetooth
+bluez
+bluez-tools
+blueman
+
+# Audio
+pipewire
+pipewire-pulse
+pipewire-audio
+wireplumber
+pavucontrol-qt
+pulseaudio-utils
+
+# Power Management
+powerdevil
+upower
+tlp
+
+# File Systems
+exfat-utils
+ntfs-3g
+btrfs-progs
+xfsprogs
+e2fsprogs
+dosfstools
+
+# Compression
+p7zip-full
+unzip
+zip
+gzip
+bzip2
+tar
+xz-utils
+zstd
