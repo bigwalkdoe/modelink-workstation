@@ -1,0 +1,156 @@
+name: Build Modelink ISO
+
+on:
+  push:
+    branches: [main, develop]
+    tags: ['v*']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      edition:
+        description: Edition to build
+        required: true
+        default: developer
+        type: choice
+        options:
+          - core
+          - developer
+          - ai
+          - security
+          - enterprise
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  build:
+    name: Build ISO (${{ inputs.edition || 'developer' }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+
+    env:
+      EDITION: ${{ inputs.edition || 'developer' }}
+      OUTPUT_DIR: /tmp/modelink-iso
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Free disk space
+        run: |
+          sudo apt-get clean
+          sudo rm -rf /var/lib/apt/lists/*
+          df -h
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            debootstrap \
+            squashfs-tools \
+            xorriso \
+            isolinux \
+            syslinux-common \
+            grub-pc-bin \
+            grub-efi-amd64-bin \
+            grub-efi-ia32-bin \
+            mtools \
+            dosfstools \
+            wget \
+            ca-certificates \
+            curl \
+            rsync
+
+      - name: Build ISO
+        run: |
+          sudo bash build/scripts/build/build-iso.sh \
+            --edition "$EDITION" \
+            --output "$OUTPUT_DIR"
+
+      - name: Extract ISO metadata
+        id: metadata
+        run: |
+          ISO_FILE=$(ls "$OUTPUT_DIR"/*.iso 2>/dev/null | head -1)
+          if [ -z "$ISO_FILE" ]; then
+            echo "No ISO file found!"
+            exit 1
+          fi
+          echo "iso_path=$ISO_FILE" >> $GITHUB_OUTPUT
+          echo "iso_name=$(basename $ISO_FILE)" >> $GITHUB_OUTPUT
+          echo "iso_size=$(stat -c%s $ISO_FILE)" >> $GITHUB_OUTPUT
+
+      - name: Upload ISO artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: modelink-${{ env.EDITION }}-iso
+          path: ${{ steps.metadata.outputs.iso_path }}
+          retention-days: 30
+          compression-level: 0
+
+      - name: Upload checksum
+        uses: actions/upload-artifact@v4
+        with:
+          name: modelink-${{ env.EDITION }}-sha256
+          path: ${{ env.OUTPUT_DIR }}/*.sha256
+          retention-days: 30
+
+      - name: Create Release (on tags only)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Modelink Workstation ${{ github.ref_name }}
+          body_path: CHANGELOG.md 2>/dev/null || echo "Release ${{ github.ref_name }}"
+          files: |
+            ${{ env.OUTPUT_DIR }}/*.iso
+            ${{ env.OUTPUT_DIR }}/*.sha256
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  validate:
+    name: Validate Configuration
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate package lists
+        run: |
+          for f in build/packages/*.txt; do
+            [ -f "$f" ] || continue
+            echo "Checking $f..."
+            while IFS= read -r line; do
+              # Skip comments and empty lines
+              [[ "$line" =~ ^#.*$ ]] && continue
+              [[ -z "$line" ]] && continue
+              # Check package name format
+              if [[ ! "$line" =~ ^[a-zA-Z0-9][a-zA-Z0-9.+_-]*$ ]]; then
+                echo "  WARNING: Suspicious package name in $f: $line"
+              fi
+            done < "$f"
+          done
+          echo "Package list validation complete."
+
+      - name: Validate shell scripts
+        run: |
+          sudo apt-get update && sudo apt-get install -y shellcheck
+          find build -name "*.sh" -exec shellcheck -x {} \;
+          echo "Shell script validation complete."
+
+      - name: Check build scripts exist
+        run: |
+          REQUIRED_FILES=(
+            "build/scripts/build/build-iso.sh"
+            "build/autoinstall/user-data"
+            "build/packages/core.txt"
+          )
+          for f in "${REQUIRED_FILES[@]}"; do
+            if [ -f "$f" ]; then
+              echo "  OK: $f"
+            else
+              echo "  MISSING: $f"
+              exit 1
+            fi
+          done
