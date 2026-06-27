@@ -15,15 +15,15 @@ update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
 # ---- Default Shell ----
 chsh -s /bin/bash root
 
-# ---- Services ----
-systemctl enable sddm
-systemctl enable NetworkManager
-systemctl enable ufw
-systemctl enable fail2ban
-systemctl enable ssh
-systemctl enable systemd-resolved
-systemctl enable avahi-daemon
-systemctl enable bluetooth
+# ---- Services (some may not be installed yet — skip gracefully) ----
+systemctl enable sddm              2>/dev/null || true
+systemctl enable NetworkManager    2>/dev/null || true
+systemctl enable ufw               2>/dev/null || true
+systemctl enable fail2ban          2>/dev/null || true
+systemctl enable ssh               2>/dev/null || true
+systemctl enable systemd-resolved  2>/dev/null || true
+systemctl enable avahi-daemon      2>/dev/null || true
+systemctl enable bluetooth         2>/dev/null || true
 
 # ---- Firewall ----
 ufw default deny incoming

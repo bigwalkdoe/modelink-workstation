@@ -75,6 +75,13 @@ log "  Label:    $ISO_LABEL"
 log "  Date:     $DATE_TAG"
 # ============================================================
 
+# ---- Check disk space ----
+AVAIL_GB=$(df --output=avail "$OUTPUT_DIR" | tail -1 | awk '{print int($1/1024/1024)}')
+if [ "$AVAIL_GB" -lt 10 ]; then
+  err "Low disk space: ${AVAIL_GB}GB available. Need at least 10GB."
+fi
+log "Disk space: ${AVAIL_GB}GB available"
+
 # ---- Clean working dirs ----
 log "Cleaning previous build..."
 rm -rf "$CHROOT_DIR" "$IMAGE_DIR"
@@ -192,12 +199,12 @@ if [ -n "$PACKAGES" ]; then
 set -uo pipefail
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
-# Best-effort batch install — some packages may not exist (e.g. non-apt, PPAs)
-apt-get install -y $PACKAGES 2>/dev/null || {
-  echo "[!] Batch install failed, trying one-by-one..." >&2
+# Best-effort install — some packages may not exist (e.g. non-apt, PPAs)
+apt-get install -y $PACKAGES || {
+  echo "[!] Batch install failed, retrying individually..." >&2
   FAILED=""
   for pkg in $PACKAGES; do
-    apt-get install -y "\$pkg" 2>/dev/null || {
+    apt-get install -y "\$pkg" 2>&1 | tail -2 || {
       echo "[!] Skipping unavailable: \$pkg" >&2
       FAILED="\$FAILED \$pkg"
     }
